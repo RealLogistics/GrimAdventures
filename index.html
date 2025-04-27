@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grim Adventures</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook&family=EB+Garamond&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-container">
+<h1>Grim Adventures</h1>
+
+<!-- Character Creation -->
+<div id="character-creation">
+<p>Enter your Name:</p>
+<input type="text" id="player-name" placeholder="Name...">
+
+<p>Choose your Gender:</p>
+<select id="player-gender">
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
+
+<p>Choose your Class:</p>
+<select id="player-class">
+<option>Knight</option>
+<option>Mage</option>
+<option>Rogue</option>
+</select>
+
+<br><br>
+<button onclick="startGame()">Play Game</button>
+<br><br>
+<button onclick="loadGame()">Load Saved Game</button>
+</div>
+
+<!-- Player Stats -->
+<div id="player-stats" style="display:none;">
+<img id="hero-portrait" src="" alt="Hero" style="width:100px; height:auto;">
+<p><strong id="player-title"></strong></p>
+<p>Health: <span id="health"></span></p>
+<p>Mana: <span id="mana"></span></p>
+<p>XP: <span id="xp"></span> / <span id="nextLevelXp"></span> (Level <span id="level"></span>)</p>
+<p>Skills: <span id="skills">None</span></p>
+<p>Inventory: <span id="inventory">Empty</span></p>
+<p>Location: (<span id="x">0</span>, <span id="y">0</span>)</p>
+</div>
+
+<!-- Story Text -->
+<div id="story-text"></div>
+
+<!-- Choices -->
+<div id="choices" style="display:none;">
+<button onclick="explore()">Explore</button>
+<button onclick="rest()">Rest</button>
+<button onclick="fight()">Fight</button>
+<br>
+<button onclick="move('north')">North</button>
+<button onclick="move('south')">South</button>
+<button onclick="move('east')">East</button>
+<button onclick="move('west')">West</button>
+<br><br>
+<button onclick="saveGame()">Save Game</button>
+<button onclick="returnToMenu()">Main Menu</button>
+</div>
+
+<!-- Map -->
+<div id="map" style="margin-top:20px;"></div>
+</div>
+
+<!-- Background Music -->
+<audio id="bg-music" loop autoplay>
+<source src="sounds/dark_forest_music.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Fade overlay and spinner -->
+<div id="fade-overlay">
+<div id="loading-spinner">Loading...</div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
