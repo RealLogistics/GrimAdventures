@@ -77,23 +77,28 @@ function chooseClass(selectedClass) {
   document.getElementById('player-stats').style.display = 'block';
   document.getElementById('choices').style.display = 'block';
 
-  inventory = [];
-  xp = 0;
-  level = 1;
-  nextLevelXp = 100;
-  skills = [];
+ inventory = [];
+xp = 0;
+level = 1;
+nextLevelXp = 100;
+skills = [];
 
-  if (playerClass === 'Knight') {
-    health = 150;
-    mana = 30;
-    inventory.push("Sword");
-    skills = ["Power Strike"];
-    document.getElementById('hero-portrait').src = "portraits/knight.png";
-  } else if (playerClass === 'Mage') {
-    health = 80;
-    mana = 120;
-    inventory.push("Spellbook");
-    skills = ["Fireball"];
-    document.getElementById('hero-portrait').src = "portraits/mage.png";
-  } else if (playerClass === 'R
-
+if (playerClass === 'Knight') {
+  health = 150;
+  mana = 30;
+  inventory.push("Sword");
+  skills = ["Power Strike"];
+  document.getElementById('hero-portrait').src = "portraits/knight.png";
+} else if (playerClass === 'Mage') {
+  health = 80;
+  mana = 120;
+  inventory.push("Spellbook");
+  skills = ["Fireball"];
+  document.getElementById('hero-portrait').src = "portraits/mage.png";
+} else if (playerClass === 'Rogue') {
+  health = 100;
+  mana = 60;
+  inventory.push("Dagger");
+  skills = ["Backstab"];
+  document.getElementById('hero-portrait').src = "portraits/rogue.png";
+}
