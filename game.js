@@ -1,4 +1,4 @@
-// Grim Adventures - Final Version with Upgrades
+// Grim Adventures - Full Final Version
 
 // GLOBAL VARIABLES
 let playerName = '';
@@ -7,7 +7,7 @@ let playerClass = '';
 let health, mana, xp, level, nextLevelXp;
 let inventory = [];
 let skills = [];
-let x = 25, y = 25; // Start in center of 50x50 map
+let x = 25, y = 25;
 const mapSize = 50;
 const map = [];
 const bosses = [
@@ -102,4 +102,55 @@ function chooseClass(selectedClass) {
     skills = ["Backstab"];
     document.getElementById('hero-portrait').src = "portraits/rogue.png";
   }
-} 
+}
+
+// INIT MAP
+function initMap() {
+  for (let i = 0; i < mapSize; i++) {
+    map[i] = [];
+    for (let j = 0; j < mapSize; j++) {
+      map[i][j] = false;
+    }
+  }
+  map[y][x] = true;
+  renderMap();
+}
+
+// UPDATE STATS
+function updateStats() {
+  document.getElementById('health').innerText = health;
+  document.getElementById('mana').innerText = mana;
+  document.getElementById('xp').innerText = xp;
+  document.getElementById('nextLevelXp').innerText = nextLevelXp;
+  document.getElementById('level').innerText = level;
+  document.getElementById('inventory').innerText = inventory.join(', ') || 'Empty';
+  document.getElementById('skills').innerText = skills.join(', ') || 'None';
+  document.getElementById('x').innerText = x;
+  document.getElementById('y').innerText = y;
+  renderMap();
+}
+
+// TYPE STORY
+function typeStory(text) {
+  let storyText = document.getElementById('story-text');
+  storyText.innerHTML = '';
+  let i = 0;
+  let typing = setInterval(() => {
+    if (i < text.length) {
+      storyText.innerHTML += text.charAt(i);
+      i++;
+    } else {
+      clearInterval(typing);
+    }
+  }, 30);
+}
+
+// RENDER MAP
+function renderMap() {
+  const mapDiv = document.getElementById('map');
+  mapDiv.innerHTML = '';
+  for (let i = y - 2; i <= y + 2; i++) {
+    for (let j = x - 2; j <= x + 2; j++) {
+      const div = document.createElement('div');
+      div.className = 'tile';
+      if (i >= 0 && i < mapSize && j >= 0 && j < mapSize) {
