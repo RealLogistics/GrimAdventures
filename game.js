@@ -53,8 +53,11 @@ function initWorld() {
     worldMap[i] = [];
     for (let j = 0; j < worldSize; j++) {
       const rand = Math.random();
-      if (rand < 0.1) worldMap[i][j] = "🌫️"; // Mist
-      else worldMap[i][j] = "🌲"; // Tree
+      if (rand < 0.05) worldMap[i][j] = "🌫️"; // Mist (rare)
+      else if (rand < 0.2) worldMap[i][j] = "🐸"; // Swamp
+      else if (rand < 0.4) worldMap[i][j] = "⛰️"; // Mountain
+      else if (rand < 0.5) worldMap[i][j] = "🪦"; // Graveyard
+      else worldMap[i][j] = "🌲"; // Forest (default)
     }
   }
 }
