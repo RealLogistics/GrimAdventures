@@ -2,118 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Grim Adventures</title>
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook&family=EB+Garamond&display=swap" rel="stylesheet">
-
-  <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Loading Screen -->
-  <div id="loading-screen">
-    <h2>Loading Grim Adventures...</h2>
-    <div class="spinner"></div>
+
+<div id="loading-screen">
+  <h1>Loading Grim Adventures...</h1>
+</div>
+
+<div id="game-container" style="display: none;">
+  <!-- Character Creation -->
+  <div id="character-creation">
+    <h2>Create Your Character</h2>
+    <input type="text" id="player-name" placeholder="Name">
+    <select id="player-gender">
+      <option value="">Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <select id="player-class">
+      <option value="">Class</option>
+      <option value="Knight">Knight</option>
+      <option value="Mage">Mage</option>
+      <option value="Rogue">Rogue</option>
+    </select>
+    <button onclick="startGame()">Start Adventure</button>
   </div>
 
-  <!-- Main Game Container -->
-  <div id="game-container" style="display:none;">
-    <h1 id="game-title">Grim Adventures</h1>
-
-    <!-- Character Creation -->
-    <div id="character-creation">
-      <p>Enter your Name:</p>
-      <input type="text" id="player-name" placeholder="Name...">
-
-      <p>Choose your Gender:</p>
-      <select id="player-gender">
-        <option>Male</option>
-        <option>Female</option>
-        <option>Other</option>
-      </select>
-
-      <p>Choose your Class:</p>
-      <select id="player-class">
-        <option>Knight</option>
-        <option>Mage</option>
-        <option>Rogue</option>
-      </select>
-
-      <br><br>
-      <button onclick="startGame()">Play Game</button>
-      <br><br>
-      <button onclick="loadGame()">Load Saved Game</button>
-    </div>
-
-    <!-- Player Stats -->
-    <div id="player-stats" style="display:none;">
-      <img id="hero-portrait" src="" alt="Hero" style="width:100px; height:auto;">
-      <p><strong id="player-title"></strong></p>
-      <p>Health: <span id="health"></span></p>
-      <p>Mana: <span id="mana"></span></p>
-      <p>XP: <span id="xp"></span> / <span id="nextLevelXp"></span> (Level <span id="level"></span>)</p>
-      <p>Skills: <span id="skills">None</span></p>
-      <p>Inventory: <span id="inventory">Empty</span></p>
-      <p>Location: (<span id="x">0</span>, <span id="y">0</span>)</p>
-    </div>
-
-    <!-- Story Text -->
-    <div id="story-text"></div>
-
-<!-- Skill Animator -->
-    <div id="skill-animation" style="
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  font-size: 5em;
-  text-align: center;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  pointer-events: none;
-"></div>
-
-    
-    <!-- Player Choices -->
-    <div id="choices" style="display:none;">
-      <button onclick="explore()">Explore</button>
-      <button onclick="rest()">Rest</button>
-      <button onclick="fight()">Fight</button>
-      <br>
-      <button onclick="move('north')">North</button>
-      <button onclick="move('south')">South</button>
-      <button onclick="move('east')">East</button>
-      <button onclick="move('west')">West</button>
-      <br><br>
-      <button onclick="saveGame()">Save Game</button>
-      <button onclick="returnToMenu()">Main Menu</button>
-    </div>
-
-    <!-- Map -->
-    <div id="map" style="margin-top:20px;"></div>
+  <!-- Player Info -->
+  <div id="player-stats" style="display:none;">
+    <h2>Stats</h2>
+    <p>Name: <span id="player-name-display"></span></p>
+    <p>Health: <span id="health"></span></p>
+    <p>Mana: <span id="mana"></span></p>
+    <p>XP: <span id="xp"></span> / <span id="nextLevelXp"></span></p>
+    <p>Level: <span id="level"></span></p>
+    <p>Inventory: <span id="inventory"></span></p>
+    <p>Skills: <span id="skills"></span></p>
+    <p>Location: (<span id="x"></span>, <span id="y"></span>)</p>
   </div>
 
-  <!-- Fade Overlay for transitions -->
-  <div id="fade-overlay">
-    <div id="loading-spinner">Loading...</div>
-  </div>
-
-  <!-- Misty Background Effect -->
+  <!-- Misty Background -->
   <div id="mist"></div>
 
-  <!-- Background Music -->
-  <audio id="bg-music" loop autoplay>
-    <source src="sounds/dark_forest_music.mp3" type="audio/mpeg">
-  </audio>
+  <!-- Portrait -->
+  <div id="portrait-container">
+    <img id="hero-portrait" src="" alt="Hero Portrait" style="height:100px;">
+  </div>
 
-  <!-- Game Script -->
-  <script src="game.js"></script>
+  <!-- Skill Animation -->
+  <div id="skill-animation"></div>
+
+  <!-- Movement Buttons -->
+  <div id="movement-buttons" style="text-align:center; margin: 10px;">
+    <button onclick="move('north')">⬆️ Up</button><br>
+    <button onclick="move('west')">⬅️ Left</button>
+    <button onclick="move('east')">➡️ Right</button><br>
+    <button onclick="move('south')">⬇️ Down</button>
+  </div>
+
+  <!-- Game Map -->
+  <div id="game-map" style="font-size: 2em; text-align: center; margin-bottom: 20px;"></div>
+
+  <!-- Actions -->
+  <div id="action-buttons" style="text-align:center;">
+    <button onclick="explore()">Explore</button>
+    <button onclick="rest()">Rest</button>
+    <button onclick="fight()">Fight</button>
+  </div>
+
+  <!-- Story Text -->
+  <div id="story-text" style="margin: 20px; font-size: 1.2em; text-align:center;"></div>
+</div>
+
+<!-- Background Music -->
+<audio id="bg-music" loop autoplay src="sounds/dark_forest_music.mp3"></audio>
+
+<!-- Scripts -->
+<script src="game.js"></script>
+
 </body>
 </html>
