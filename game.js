@@ -53,29 +53,34 @@ function initWorld() {
     worldMap[i] = [];
     for (let j = 0; j < worldSize; j++) {
       const rand = Math.random();
-      if (rand < 0.05) worldMap[i][j] = "🌫️"; // Mist
-      else if (rand < 0.2) worldMap[i][j] = "🐸"; // Swamp
-      else if (rand < 0.4) worldMap[i][j] = "⛰️"; // Mountain
-      else if (rand < 0.5) worldMap[i][j] = "🪦"; // Graveyard
+      if (rand < 0.03) worldMap[i][j] = "🏰"; // Village (rare)
+      else if (rand < 0.06) worldMap[i][j] = "🛖"; // Hut (rare)
+      else if (rand < 0.09) worldMap[i][j] = "🤠"; // Traveler (rare)
+      else if (rand < 0.14) worldMap[i][j] = "🌫️"; // Mist
+      else if (rand < 0.3) worldMap[i][j] = "🐸"; // Swamp
+      else if (rand < 0.5) worldMap[i][j] = "⛰️"; // Mountain
+      else if (rand < 0.6) worldMap[i][j] = "🪦"; // Graveyard
       else worldMap[i][j] = "🌲"; // Forest
     }
   }
 }
+
 //Enemy Spawn
 function spawnEnemiesNearby() {
-  const spawnChance = 0.15; // 15% chance overall
-  const graveyardBonus = 0.3; // 30% extra if near graveyard
+  const spawnChance = 0.15;
+  const graveyardBonus = 0.3;
 
   for (let dy = -1; dy <= 1; dy++) {
     for (let dx = -1; dx <= 1; dx++) {
-      if (dy === 0 && dx === 0) continue; // skip center tile
+      if (dy === 0 && dx === 0) continue;
 
       const newY = y + dy;
       const newX = x + dx;
 
       if (newY >= 0 && newY < worldSize && newX >= 0 && newX < worldSize) {
-        if (worldMap[newY][newX] === "🌲" || worldMap[newY][newX] === "🐸" || worldMap[newY][newX] === "🪦") {
-          const bonus = (worldMap[newY][newX] === "🪦" || worldMap[newY][newX] === "🐸") ? graveyardBonus : 0;
+        const tile = worldMap[newY][newX];
+        if (tile === "🌲" || tile === "🐸" || tile === "🪦") {
+          const bonus = (tile === "🪦" || tile === "🐸") ? graveyardBonus : 0;
           if (Math.random() < (spawnChance + bonus)) {
             worldMap[newY][newX] = randomEnemyEmoji();
           }
@@ -191,7 +196,6 @@ function chooseClass(selectedClass) {
   typeStory(`${playerName} the ${playerClass} steps into the misty unknown...`);
 }
 
-// MOVE
 function move(direction) {
   if (direction === 'north' && y > 0) y--;
   else if (direction === 'south' && y < worldSize - 1) y++;
@@ -205,9 +209,20 @@ function move(direction) {
   const currentTile = worldMap[y][x];
 
   if (currentTile === "🧟" || currentTile === "🧛‍♂️" || currentTile === "🐍" || currentTile === "🐲") {
-    // Trigger auto-fight
     autoFight(currentTile);
-    worldMap[y][x] = "🌲"; // After fight, turn tile back to forest
+    worldMap[y][x] = "🌲"; // Clear tile after battle
+  } else if (currentTile === "🏰") {
+    typeStory("🏰 You arrive at a peaceful village. Travelers greet you warmly.");
+  } else if (currentTile === "🛖") {
+    typeStory("🛖 You find a small hut. An old woman offers you tea.");
+  } else if (currentTile === "🤠") {
+    const messages = [
+      "🤠 'The graveyards are dangerous. Watch yourself.'",
+      "🤠 'They say a dragon sleeps to the east.'",
+      "🤠 'Stay out of the swamp at night, traveler.'",
+      "🤠 'Legends speak of a lost relic hidden in the mist.'"
+    ];
+    typeStory(messages[Math.floor(Math.random() * messages.length)]);
   } else {
     spawnEnemiesNearby();
     drawMap();
@@ -215,46 +230,11 @@ function move(direction) {
     updateStats();
     typeStory(`You move ${direction} into the misty unknown...`);
   }
-}
-function autoFight(enemyEmoji) {
-  sounds.attack.play();
-
-  let enemy;
-  if (enemyEmoji === "🐲") {
-    enemy = { name: "Ancient Drake", hp: 200, attack: 50, xp: 250 };
-  } else {
-    enemy = { name: "Wandering Foe", hp: 80, attack: 20, xp: 50 };
-  }
-
-  const playerAttack = Math.floor(Math.random() * 50) + (skills.length * 5);
-
-  // Play skill animation if you have one unlocked
-  if (skills.includes("Rain of Arrows")) {
-    animateSkill("Rain of Arrows");
-  } else if (skills.includes("Fireball")) {
-    animateSkill("Fireball");
-  } else if (skills.includes("Shield Strike")) {
-    animateSkill("Shield Strike");
-  } else if (skills.includes("Necromancy")) {
-    animateSkill("Necromancy");
-  }
-
-  if (playerAttack >= enemy.hp) {
-    typeStory(`You defeated the ${enemy.name}! +${enemy.xp} XP.`);
-    gainXp(enemy.xp);
-  } else {
-    const damage = enemy.attack - (inventory.includes("Rare Armor") ? 10 : 0);
-    health -= damage;
-    typeStory(`The ${enemy.name} wounded you! -${damage} HP.`);
-    if (health <= 0) {
-      triggerDeath();
-      return;
-    }
-  }
 
   drawMap();
   updateStats();
 }
+
 
 
 // TYPE STORY
