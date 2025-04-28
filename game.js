@@ -1,4 +1,4 @@
-// Grim Adventures - Full Final Version Corrected
+// Grim Adventures - Final Corrected Version
 
 // GLOBAL VARIABLES
 let playerName = '';
@@ -14,6 +14,7 @@ const bosses = [
   { x: 0, y: 0 }, { x: 0, y: 49 }, { x: 49, y: 0 }, { x: 49, y: 49 }, { x: 25, y: 25 }
 ];
 let bossesDefeated = 0;
+let typingInterval; // 🆕 Add this to track typing
 
 // ENEMIES
 const enemies = [
@@ -37,18 +38,15 @@ const sounds = {
   thunder: new Audio('sounds/thunder.mp3')
 };
 
-// FADE IN MUSIC (corrected version!)
+// FADE IN MUSIC (corrected)
 const bgMusic = document.getElementById('bg-music');
 bgMusic.volume = 0;
 bgMusic.addEventListener('canplaythrough', () => {
   let vol = 0;
   const fadeIn = setInterval(() => {
-    vol = Math.min(vol + 0.01, 1); // Safely clamp volume between 0 and 1
+    vol = Math.min(vol + 0.01, 1); // Safely clamp volume
     bgMusic.volume = vol;
-
-    if (vol >= 1) {
-      clearInterval(fadeIn);
-    }
+    if (vol >= 1) clearInterval(fadeIn);
   }, 50);
 });
 
@@ -130,17 +128,20 @@ function updateStats() {
   renderMap();
 }
 
-// TYPE STORY
+// TYPE STORY (fixed to prevent jumbled text!)
 function typeStory(text) {
+  clearInterval(typingInterval); // Stop previous typing
+
   let storyText = document.getElementById('story-text');
   storyText.innerHTML = '';
   let i = 0;
-  let typing = setInterval(() => {
+
+  typingInterval = setInterval(() => {
     if (i < text.length) {
       storyText.innerHTML += text.charAt(i);
       i++;
     } else {
-      clearInterval(typing);
+      clearInterval(typingInterval);
     }
   }, 30);
 }
@@ -171,7 +172,7 @@ function move(direction) {
     typeStory("You cannot go that way.");
     return;
   }
-  
+
   map[y][x] = true;
   randomWeather();
   typeStory(`You move ${direction} into the shifting mist...`);
@@ -182,11 +183,8 @@ function move(direction) {
 // RANDOM WEATHER
 function randomWeather() {
   const chance = Math.random();
-  if (chance < 0.05) {
-    sounds.thunder.play();
-  } else if (chance < 0.10) {
-    sounds.rain.play();
-  }
+  if (chance < 0.05) sounds.thunder.play();
+  else if (chance < 0.10) sounds.rain.play();
 }
 
 // CHANGE BACKGROUND
@@ -266,7 +264,7 @@ function fight() {
     health -= damage;
     typeStory(`The ${enemy.name} wounded you! -${damage} HP.`);
   }
-  
+
   updateStats();
   checkVictory();
 }
@@ -287,7 +285,7 @@ function gainXp(amount) {
   }
 }
 
-// SPARKLE EFFECT on LEVEL UP
+// SPARKLE EFFECT
 function sparkleEffect() {
   const mist = document.getElementById('mist');
   mist.style.opacity = 0.4;
@@ -322,7 +320,7 @@ function checkVictory() {
   }
 }
 
-// PAGE LOAD EVENT - HIDE LOADING SCREEN
+// PAGE LOAD - HIDE LOADING SCREEN
 window.addEventListener('load', () => {
   const loadingScreen = document.getElementById('loading-screen');
   const gameContainer = document.getElementById('game-container');
