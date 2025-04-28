@@ -53,13 +53,41 @@ function initWorld() {
     worldMap[i] = [];
     for (let j = 0; j < worldSize; j++) {
       const rand = Math.random();
-      if (rand < 0.05) worldMap[i][j] = "🌫️"; // Mist (rare)
+      if (rand < 0.05) worldMap[i][j] = "🌫️"; // Mist
       else if (rand < 0.2) worldMap[i][j] = "🐸"; // Swamp
       else if (rand < 0.4) worldMap[i][j] = "⛰️"; // Mountain
       else if (rand < 0.5) worldMap[i][j] = "🪦"; // Graveyard
-      else worldMap[i][j] = "🌲"; // Forest (default)
+      else worldMap[i][j] = "🌲"; // Forest
     }
   }
+}
+//Enemy Spawn
+function spawnEnemiesNearby() {
+  const spawnChance = 0.15; // 15% chance overall
+  const graveyardBonus = 0.3; // 30% extra if near graveyard
+
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (dy === 0 && dx === 0) continue; // skip center tile
+
+      const newY = y + dy;
+      const newX = x + dx;
+
+      if (newY >= 0 && newY < worldSize && newX >= 0 && newX < worldSize) {
+        if (worldMap[newY][newX] === "🌲" || worldMap[newY][newX] === "🐸" || worldMap[newY][newX] === "🪦") {
+          const bonus = (worldMap[newY][newX] === "🪦" || worldMap[newY][newX] === "🐸") ? graveyardBonus : 0;
+          if (Math.random() < (spawnChance + bonus)) {
+            worldMap[newY][newX] = randomEnemyEmoji();
+          }
+        }
+      }
+    }
+  }
+}
+
+function randomEnemyEmoji() {
+  const enemies = ["🧟", "🧛‍♂️", "🐍", "🐲"];
+  return enemies[Math.floor(Math.random() * enemies.length)];
 }
 
 // DRAW 5x5 VIEW
@@ -150,11 +178,50 @@ function move(direction) {
     return;
   }
 
-  drawMap();
-  randomWeather();
-  updateStats();
-  typeStory(`You move ${direction} into the misty unknown...`);
+  const currentTile = worldMap[y][x];
+
+  if (currentTile === "🧟" || currentTile === "🧛‍♂️" || currentTile === "🐍" || currentTile === "🐲") {
+    // Trigger auto-fight
+    autoFight(currentTile);
+    worldMap[y][x] = "🌲"; // After fight, turn tile back to forest
+  } else {
+    spawnEnemiesNearby();
+    drawMap();
+    randomWeather();
+    updateStats();
+    typeStory(`You move ${direction} into the misty unknown...`);
+  }
 }
+//Auto Fight
+function autoFight(enemyEmoji) {
+  sounds.attack.play();
+
+  let enemy;
+  if (enemyEmoji === "🐲") {
+    enemy = { name: "Ancient Drake", hp: 200, attack: 50, xp: 250 };
+  } else {
+    enemy = { name: "Wandering Foe", hp: 80, attack: 20, xp: 50 };
+  }
+
+  const playerAttack = Math.floor(Math.random() * 50) + (skills.length * 5);
+
+  if (playerAttack >= enemy.hp) {
+    typeStory(`You defeated the ${enemy.name}! +${enemy.xp} XP.`);
+    gainXp(enemy.xp);
+  } else {
+    const damage = enemy.attack - (inventory.includes("Rare Armor") ? 10 : 0);
+    health -= damage;
+    typeStory(`The ${enemy.name} wounded you! -${damage} HP.`);
+    if (health <= 0) {
+      triggerDeath();
+      return;
+    }
+  }
+
+  drawMap();
+  updateStats();
+}
+
 
 // TYPE STORY
 function typeStory(text) {
