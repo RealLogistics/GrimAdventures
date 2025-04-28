@@ -109,6 +109,30 @@ function drawMap() {
   }
 }
 
+//Skill Animator
+function animateSkill(skillName) {
+  const skillDiv = document.getElementById('skill-animation');
+  let animation = '';
+
+  if (skillName === "Rain of Arrows") {
+    animation = "🏹🌧️🏹🌧️";
+  } else if (skillName === "Fireball") {
+    animation = "🔥💥🔥💥";
+  } else if (skillName === "Shield Strike") {
+    animation = "🛡️💥";
+  } else if (skillName === "Necromancy") {
+    animation = "☠️💀👻";
+  }
+
+  skillDiv.innerText = animation;
+  skillDiv.style.display = 'flex';
+  
+  setTimeout(() => {
+    skillDiv.style.display = 'none';
+  }, 1000);
+}
+
+
 // START GAME
 function startGame() {
   const fade = document.getElementById('fade-overlay');
@@ -192,7 +216,6 @@ function move(direction) {
     typeStory(`You move ${direction} into the misty unknown...`);
   }
 }
-//Auto Fight
 function autoFight(enemyEmoji) {
   sounds.attack.play();
 
@@ -204,6 +227,17 @@ function autoFight(enemyEmoji) {
   }
 
   const playerAttack = Math.floor(Math.random() * 50) + (skills.length * 5);
+
+  // Play skill animation if you have one unlocked
+  if (skills.includes("Rain of Arrows")) {
+    animateSkill("Rain of Arrows");
+  } else if (skills.includes("Fireball")) {
+    animateSkill("Fireball");
+  } else if (skills.includes("Shield Strike")) {
+    animateSkill("Shield Strike");
+  } else if (skills.includes("Necromancy")) {
+    animateSkill("Necromancy");
+  }
 
   if (playerAttack >= enemy.hp) {
     typeStory(`You defeated the ${enemy.name}! +${enemy.xp} XP.`);
@@ -287,7 +321,6 @@ function rest() {
   updateStats();
 }
 
-// FIGHT
 function fight() {
   let enemy;
   if (bosses.some(b => b.x === x && b.y === y)) {
@@ -299,6 +332,17 @@ function fight() {
   }
 
   const playerAttack = Math.floor(Math.random() * 50) + (skills.length * 5);
+
+  // Play skill animation if you have one unlocked
+  if (skills.includes("Rain of Arrows")) {
+    animateSkill("Rain of Arrows");
+  } else if (skills.includes("Fireball")) {
+    animateSkill("Fireball");
+  } else if (skills.includes("Shield Strike")) {
+    animateSkill("Shield Strike");
+  } else if (skills.includes("Necromancy")) {
+    animateSkill("Necromancy");
+  }
 
   if (playerAttack >= enemy.hp) {
     typeStory(`You defeated the ${enemy.name}! +${enemy.xp} XP.`);
