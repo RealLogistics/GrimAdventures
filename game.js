@@ -101,4 +101,5 @@ if (playerClass === 'Knight') {
   inventory.push("Dagger");
   skills = ["Backstab"];
   document.getElementById('hero-portrait').src = "portraits/rogue.png";
+ }
 }
