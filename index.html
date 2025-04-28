@@ -8,11 +8,14 @@
 </head>
 <body>
 
+<!-- Loading screen -->
 <div id="loading-screen">
   <h1>Loading Grim Adventures...</h1>
 </div>
 
+<!-- Main Game Container -->
 <div id="game-container" style="display: none;">
+  
   <!-- Character Creation -->
   <div id="character-creation">
     <h2>Create Your Character</h2>
@@ -31,7 +34,7 @@
     <button onclick="startGame()">Start Adventure</button>
   </div>
 
-  <!-- Player Info -->
+  <!-- Player Stats -->
   <div id="player-stats" style="display:none;">
     <h2>Stats</h2>
     <p>Name: <span id="player-name-display"></span></p>
@@ -44,15 +47,15 @@
     <p>Location: (<span id="x"></span>, <span id="y"></span>)</p>
   </div>
 
-  <!-- Misty Background -->
+  <!-- Mist Background -->
   <div id="mist"></div>
 
-  <!-- Portrait -->
+  <!-- Hero Portrait -->
   <div id="portrait-container">
     <img id="hero-portrait" src="" alt="Hero Portrait" style="height:100px;">
   </div>
 
-  <!-- Skill Animation -->
+  <!-- Skill Animation Layer -->
   <div id="skill-animation"></div>
 
   <!-- Movement Buttons -->
@@ -80,8 +83,9 @@
 <!-- Background Music -->
 <audio id="bg-music" loop autoplay src="sounds/dark_forest_music.mp3"></audio>
 
-<!-- Scripts -->
+<!-- JavaScript -->
 <script src="game.js"></script>
 
 </body>
 </html>
+
