@@ -289,14 +289,20 @@ function startGame() {
 
   document.getElementById('player-name-display').innerText = playerName;
 
-  initWorld();
-  chooseClass(playerClass);
+  initWorld(); // ✅ Generate the world first
+  chooseClass(playerClass); // ✅ Setup player class
 
   document.getElementById('character-creation').style.display = 'none';
   document.getElementById('player-stats').style.display = 'block';
-  drawMap();
-  typeStory(`${playerName} the ${playerClass} steps into the misty unknown...`);
+  document.getElementById('choices').style.display = 'block'; // In case you have it
+
+  setTimeout(() => {
+    drawMap();     // ✅ After tiny delay
+    updateStats(); // ✅ After tiny delay
+    typeStory(`${playerName} the ${playerClass} steps into the misty unknown...`);
+  }, 100); // wait 100 milliseconds to let everything load
 }
+
 
 // CHOOSE CLASS
 function chooseClass(selectedClass) {
