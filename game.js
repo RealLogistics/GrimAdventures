@@ -1,4 +1,4 @@
-// Grim Adventures - Full Final Version
+// Grim Adventures - Final Full JS
 
 // GLOBAL VARIABLES
 let playerName = '';
@@ -27,7 +27,7 @@ const enemies = [
   { name: "Revenant", hp: 90, attack: 35, xp: 80 }
 ];
 
-// SOUNDS
+// SOUND EFFECTS
 const sounds = {
   attack: new Audio('sounds/attack.mp3'),
   explore: new Audio('sounds/explore.mp3'),
@@ -104,12 +104,12 @@ function move(direction) {
   } else if (currentTile === "🏰") {
     typeStory("🏰 You arrive at a peaceful village.");
   } else if (currentTile === "🛖") {
-    typeStory("🛖 A kind hermit invites you inside the hut.");
+    typeStory("🛖 A kind hermit invites you inside.");
   } else if (currentTile === "🤠") {
     const messages = [
       "🤠 'Beware the graveyards!'",
       "🤠 'A dragon sleeps to the east.'",
-      "🤠 'Misty forests hide treasures.'"
+      "🤠 'Lost relics hide in the mist.'"
     ];
     typeStory(messages[Math.floor(Math.random() * messages.length)]);
   } else {
@@ -156,7 +156,7 @@ function explore() {
   const find = Math.random();
   if (find < 0.3) {
     health = Math.min(health + 20, maxHealth);
-    typeStory("You find a healing spring.");
+    typeStory("You find a healing spring!");
   } else if (find < 0.6) {
     mana = Math.min(mana + 20, maxMana);
     typeStory("You find a glowing mana shard.");
@@ -195,12 +195,11 @@ function fight() {
   updateStats();
 }
 
-// AUTO FIGHT
 function autoFight(enemyEmoji) {
   fight();
 }
 
-// XP + LEVELING
+// XP + LEVEL UP
 function gainXp(amount) {
   xp += amount;
   if (xp >= nextLevelXp) {
@@ -216,7 +215,7 @@ function gainXp(amount) {
   }
 }
 
-// STORY TEXT
+// STORY TYPING EFFECT
 function typeStory(text) {
   clearInterval(typingInterval);
   const storyText = document.getElementById('story-text');
@@ -232,7 +231,7 @@ function typeStory(text) {
   }, 30);
 }
 
-// UPDATE PLAYER STATS
+// UPDATE STATS
 function updateStats() {
   document.getElementById('health').innerText = health;
   document.getElementById('mana').innerText = mana;
@@ -245,7 +244,7 @@ function updateStats() {
   document.getElementById('y').innerText = y;
 }
 
-// SPARKLE EFFECT
+// SPARKLE
 function sparkleEffect() {
   const mist = document.getElementById('mist');
   mist.style.opacity = 0.4;
@@ -254,7 +253,7 @@ function sparkleEffect() {
   }, 1000);
 }
 
-// DEATH + RESTART
+// DEATH
 function triggerDeath() {
   document.getElementById('game-container').style.display = 'none';
   const deathScreen = document.createElement('div');
@@ -290,41 +289,47 @@ function startGame() {
 
   document.getElementById('player-name-display').innerText = playerName;
 
+  initWorld();
+  chooseClass(playerClass);
+
+  document.getElementById('character-creation').style.display = 'none';
+  document.getElementById('player-stats').style.display = 'block';
+  drawMap();
+  typeStory(`${playerName} the ${playerClass} steps into the misty unknown...`);
+}
+
+// CHOOSE CLASS
+function chooseClass(selectedClass) {
   inventory = [];
   skills = [];
   xp = 0;
   level = 1;
   nextLevelXp = 100;
 
-  if (playerClass === 'Knight') {
+  if (selectedClass === 'Knight') {
     health = maxHealth = 150;
     mana = maxMana = 30;
     inventory.push("Sword");
-    skills.push("Shield Strike");
+    skills = ["Shield Strike"];
     document.getElementById('hero-portrait').src = "portraits/knight.png";
-  } else if (playerClass === 'Mage') {
+  } else if (selectedClass === 'Mage') {
     health = maxHealth = 80;
     mana = maxMana = 120;
     inventory.push("Spellbook");
-    skills.push("Fireball");
+    skills = ["Fireball"];
     document.getElementById('hero-portrait').src = "portraits/mage.png";
-  } else if (playerClass === 'Rogue') {
+  } else if (selectedClass === 'Rogue') {
     health = maxHealth = 100;
     mana = maxMana = 60;
     inventory.push("Dagger");
-    skills.push("Rain of Arrows");
+    skills = ["Rain of Arrows"];
     document.getElementById('hero-portrait').src = "portraits/rogue.png";
   }
 
-  initWorld();
-  drawMap();
-  updateStats();
-  document.getElementById('character-creation').style.display = 'none';
-  document.getElementById('player-stats').style.display = 'block';
-  typeStory(`${playerName} the ${playerClass} steps into the misty unknown...`);
+  updateStats(); // ✅ IMPORTANT
 }
 
-// PAGE LOAD
+// ON PAGE LOAD
 window.addEventListener('load', () => {
   const loadingScreen = document.getElementById('loading-screen');
   const gameContainer = document.getElementById('game-container');
