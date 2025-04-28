@@ -65,6 +65,55 @@ function initWorld() {
     }
   }
 }
+//Start Game
+function startGame() {
+  playerName = document.getElementById('player-name').value || 'Unknown';
+  playerGender = document.getElementById('player-gender').value;
+  playerClass = document.getElementById('player-class').value;
+
+  if (!playerClass) {
+    alert("Please choose a class!");
+    return;
+  }
+
+  document.getElementById('player-name-display').innerText = playerName;
+
+  // Set basic stats first
+  inventory = [];
+  skills = [];
+  xp = 0;
+  level = 1;
+  nextLevelXp = 100;
+
+  if (playerClass === 'Knight') {
+    health = maxHealth = 150;
+    mana = maxMana = 30;
+    inventory.push("Sword");
+    skills = ["Shield Strike"];
+    document.getElementById('hero-portrait').src = "portraits/knight.png";
+  } else if (playerClass === 'Mage') {
+    health = maxHealth = 80;
+    mana = maxMana = 120;
+    inventory.push("Spellbook");
+    skills = ["Fireball"];
+    document.getElementById('hero-portrait').src = "portraits/mage.png";
+  } else if (playerClass === 'Rogue') {
+    health = maxHealth = 100;
+    mana = maxMana = 60;
+    inventory.push("Dagger");
+    skills = ["Rain of Arrows"];
+    document.getElementById('hero-portrait').src = "portraits/rogue.png";
+  }
+
+  initWorld();   // Initialize the world after setting class
+
+  document.getElementById('character-creation').style.display = 'none';
+  document.getElementById('player-stats').style.display = 'block';
+
+  drawMap();     // Only now draw the map
+  updateStats(); // Update stats after health/mana/xp are ready
+  typeStory(`${playerName} the ${playerClass} steps into the misty unknown...`);
+}
 
 // DRAW MAP
 function drawMap() {
