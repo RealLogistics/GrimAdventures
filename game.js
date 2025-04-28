@@ -154,3 +154,170 @@ function renderMap() {
       const div = document.createElement('div');
       div.className = 'tile';
       if (i >= 0 && i < mapSize && j >= 0 && j < mapSize) {
+        if (map[i][j]) div.classList.add('revealed');
+      }
+      mapDiv.appendChild(div);
+    }
+  }
+}
+
+// MOVE
+function move(direction) {
+  if (direction === 'north' && y > 0) y--;
+  else if (direction === 'south' && y < mapSize - 1) y++;
+  else if (direction === 'east' && x < mapSize - 1) x++;
+  else if (direction === 'west' && x > 0) x--;
+  else {
+    typeStory("You cannot go that way.");
+    return;
+  }
+  
+  map[y][x] = true;
+  randomWeather();
+  typeStory(`You move ${direction} into the shifting mist...`);
+  changeBackground('images/dark_forest_background.jpg');
+  updateStats();
+}
+
+// RANDOM WEATHER
+function randomWeather() {
+  const chance = Math.random();
+  if (chance < 0.05) {
+    sounds.thunder.play();
+  } else if (chance < 0.10) {
+    sounds.rain.play();
+  }
+}
+
+// CHANGE BACKGROUND
+function changeBackground(imageFile) {
+  document.body.style.backgroundImage = `url('${imageFile}')`;
+}
+
+// EXPLORE
+function explore() {
+  sounds.explore.play();
+  const eventChance = Math.random();
+  if (eventChance < 0.1) {
+    rareEvent();
+  } else {
+    const find = Math.random();
+    if (find < 0.3) {
+      health += 20;
+      typeStory("You find a healing spring. +20 Health.");
+    } else if (find < 0.6) {
+      mana += 20;
+      typeStory("You find a glowing mana shard. +20 Mana.");
+    } else {
+      inventory.push("Relic");
+      typeStory("You discover an ancient relic!");
+    }
+  }
+  changeBackground('images/dark_forest_background.jpg');
+  updateStats();
+}
+
+// RARE EVENT
+function rareEvent() {
+  const event = Math.random();
+  if (event < 0.5) {
+    typeStory("A portal appears! You are teleported randomly.");
+    x = Math.floor(Math.random() * mapSize);
+    y = Math.floor(Math.random() * mapSize);
+    changeBackground('images/magic_portal.jpg');
+  } else {
+    typeStory("You find an Ancient Shrine. +100 XP!");
+    gainXp(100);
+    changeBackground('images/magic_portal.jpg');
+  }
+}
+
+// REST
+function rest() {
+  health += 30;
+  mana += 30;
+  sounds.rest.play();
+  typeStory("You rest under a calm clearing, regaining strength.");
+  changeBackground('images/calm_clearing.jpg');
+  updateStats();
+}
+
+// FIGHT
+function fight() {
+  let enemy;
+  if (bosses.some(b => b.x === x && b.y === y)) {
+    enemy = { name: "Ancient Wyrm", hp: 250, attack: 60, xp: 300 };
+    sounds.boss.play();
+    changeBackground('images/boss_lair.jpg');
+  } else {
+    enemy = enemies[Math.floor(Math.random() * enemies.length)];
+    sounds.attack.play();
+    changeBackground('images/battlefield.jpg');
+  }
+
+  const playerAttack = Math.floor(Math.random() * 50) + (skills.length * 5);
+
+  if (playerAttack >= enemy.hp) {
+    typeStory(`You defeated the ${enemy.name}! +${enemy.xp} XP.`);
+    gainXp(enemy.xp);
+    if (enemy.name === "Ancient Wyrm") bossesDefeated++;
+  } else {
+    const damage = enemy.attack - (inventory.includes("Rare Armor") ? 10 : 0);
+    health -= damage;
+    typeStory(`The ${enemy.name} wounded you! -${damage} HP.`);
+  }
+  
+  updateStats();
+  checkVictory();
+}
+
+// XP SYSTEM
+function gainXp(amount) {
+  xp += amount;
+  if (xp >= nextLevelXp) {
+    level++;
+    xp = 0;
+    nextLevelXp += 50;
+    health += 50;
+    mana += 30;
+    sounds.levelup.play();
+    sparkleEffect();
+    unlockSkill();
+    typeStory(`Level up! Now Level ${level}.`);
+  }
+}
+
+// SPARKLE EFFECT on LEVEL UP
+function sparkleEffect() {
+  const mist = document.getElementById('mist');
+  mist.style.opacity = 0.4;
+  setTimeout(() => {
+    mist.style.opacity = 0.1;
+  }, 1000);
+}
+
+// UNLOCK SKILL
+function unlockSkill() {
+  const unlocks = {
+    Knight: ["Shield Bash", "Shield Strike"],
+    Mage: ["Lightning Bolt", "Necromancy"],
+    Rogue: ["Poison Blade", "Rain of Arrows"]
+  };
+  const options = unlocks[playerClass];
+  if (options && skills.length < options.length + 1) {
+    skills.push(options[skills.length - 1]);
+  }
+}
+
+// VICTORY CHECK
+function checkVictory() {
+  if (bossesDefeated >= 5) {
+    typeStory("You have defeated all the ancient evils! New Game+ unlocked!");
+    health = 200;
+    mana = 150;
+    bossesDefeated = 0;
+    x = 25;
+    y = 25;
+    initMap();
+  }
+}
