@@ -1,4 +1,4 @@
-// Grim Adventures - Full Final Version
+// Grim Adventures - Full Final Version Corrected
 
 // GLOBAL VARIABLES
 let playerName = '';
@@ -37,16 +37,16 @@ const sounds = {
   thunder: new Audio('sounds/thunder.mp3')
 };
 
-// FADE IN MUSIC
+// FADE IN MUSIC (corrected version!)
 const bgMusic = document.getElementById('bg-music');
 bgMusic.volume = 0;
 bgMusic.addEventListener('canplaythrough', () => {
   let vol = 0;
   const fadeIn = setInterval(() => {
-    if (vol < 1) {
-      vol += 0.01;
-      bgMusic.volume = vol;
-    } else {
+    vol = Math.min(vol + 0.01, 1); // Safely clamp volume between 0 and 1
+    bgMusic.volume = vol;
+
+    if (vol >= 1) {
       clearInterval(fadeIn);
     }
   }, 50);
@@ -321,3 +321,14 @@ function checkVictory() {
     initMap();
   }
 }
+
+// PAGE LOAD EVENT - HIDE LOADING SCREEN
+window.addEventListener('load', () => {
+  const loadingScreen = document.getElementById('loading-screen');
+  const gameContainer = document.getElementById('game-container');
+
+  setTimeout(() => {
+    loadingScreen.style.display = 'none';
+    gameContainer.style.display = 'block';
+  }, 1500);
+});
