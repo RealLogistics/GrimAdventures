@@ -85,7 +85,7 @@ function drawMap() {
   }
 }
 
-// MOVE
+// MOVE — now clears the tile & redraws immediately after a fight
 function move(direction) {
   if (direction === 'north' && y > 0) y--;
   else if (direction === 'south' && y < worldSize - 1) y++;
@@ -100,7 +100,8 @@ function move(direction) {
 
   if (["🧟", "🧛‍♂️", "🐍", "🐲"].includes(currentTile)) {
     autoFight(currentTile);
-    worldMap[y][x] = "🌲";
+    worldMap[y][x] = "🌲";   // clear the monster after one fight
+    drawMap();               // update the visible map
   } else if (currentTile === "🏰") {
     typeStory("🏰 You arrive at a peaceful village.");
   } else if (currentTile === "🛖") {
@@ -118,9 +119,9 @@ function move(direction) {
     typeStory(`You move ${direction} into the misty unknown...`);
   }
 
-  drawMap();
   updateStats();
 }
+
 
 // SPAWN ENEMIES NEARBY
 function spawnEnemiesNearby() {
@@ -195,9 +196,32 @@ function fight() {
   updateStats();
 }
 
+// AUTO-FIGHT — runs one quick battle, updates stats, and returns
 function autoFight(enemyEmoji) {
-  fight();
+  sounds.attack.play();
+
+  let enemy;
+  if (enemyEmoji === "🐲") {
+    enemy = { name: "Ancient Drake", hp: 200, attack: 50, xp: 250 };
+  } else {
+    enemy = { name: "Wandering Monster", hp: 80, attack: 20, xp: 50 };
+  }
+
+  const playerAttack = Math.floor(Math.random() * 50) + (skills.length * 5);
+
+  if (playerAttack >= enemy.hp) {
+    typeStory(`You defeated the ${enemy.name}! +${enemy.xp} XP`);
+    gainXp(enemy.xp);
+  } else {
+    const damage = enemy.attack;
+    health -= damage;
+    typeStory(`The ${enemy.name} wounded you! -${damage} HP`);
+    if (health <= 0) return triggerDeath();
+  }
+
+  updateStats();
 }
+
 
 // XP + LEVEL UP
 function gainXp(amount) {
