@@ -1,4 +1,4 @@
-// Grim Adventures - Final Corrected Version with Max Health, Death Screen, Smooth Typing
+// Grim Adventures - 2D Emoji Infinite World Version
 
 // GLOBAL VARIABLES
 let playerName = '';
@@ -8,11 +8,8 @@ let health, maxHealth, mana, maxMana, xp, level, nextLevelXp;
 let inventory = [];
 let skills = [];
 let x = 25, y = 25;
-const mapSize = 50;
-const map = [];
-const bosses = [
-  { x: 0, y: 0 }, { x: 0, y: 49 }, { x: 49, y: 0 }, { x: 49, y: 49 }, { x: 25, y: 25 }
-];
+const worldSize = 50; // Big world size
+const worldMap = []; // 2D map of emojis
 let bossesDefeated = 0;
 let typingInterval;
 
@@ -49,6 +46,37 @@ bgMusic.addEventListener('canplaythrough', () => {
     if (vol >= 1) clearInterval(fadeIn);
   }, 50);
 });
+
+// INIT BIG WORLD
+function initWorld() {
+  for (let i = 0; i < worldSize; i++) {
+    worldMap[i] = [];
+    for (let j = 0; j < worldSize; j++) {
+      const rand = Math.random();
+      if (rand < 0.1) worldMap[i][j] = "🌫️"; // Mist
+      else worldMap[i][j] = "🌲"; // Tree
+    }
+  }
+}
+
+// DRAW 5x5 VIEW
+function drawMap() {
+  const mapDiv = document.getElementById('game-map');
+  mapDiv.innerHTML = '';
+
+  for (let row = y - 2; row <= y + 2; row++) {
+    for (let col = x - 2; col <= x + 2; col++) {
+      if (row === y && col === x) {
+        mapDiv.innerHTML += "🧝 "; // Player
+      } else if (row >= 0 && col >= 0 && row < worldSize && col < worldSize) {
+        mapDiv.innerHTML += worldMap[row][col] + " ";
+      } else {
+        mapDiv.innerHTML += "⬛ "; // World edge
+      }
+    }
+    mapDiv.innerHTML += "<br>";
+  }
+}
 
 // START GAME
 function startGame() {
@@ -101,39 +129,31 @@ function chooseClass(selectedClass) {
     document.getElementById('hero-portrait').src = "portraits/rogue.png";
   }
 
-  initMap();
+  initWorld();
+  drawMap();
   updateStats();
   changeBackground('images/dark_forest_background.jpg');
   typeStory(`${playerName} the ${playerClass} steps into the misty unknown...`);
 }
 
-// INIT MAP
-function initMap() {
-  for (let i = 0; i < mapSize; i++) {
-    map[i] = [];
-    for (let j = 0; j < mapSize; j++) {
-      map[i][j] = false;
-    }
+// MOVE
+function move(direction) {
+  if (direction === 'north' && y > 0) y--;
+  else if (direction === 'south' && y < worldSize - 1) y++;
+  else if (direction === 'west' && x > 0) x--;
+  else if (direction === 'east' && x < worldSize - 1) x++;
+  else {
+    typeStory("You can't go that way.");
+    return;
   }
-  map[y][x] = true;
-  renderMap();
+
+  drawMap();
+  randomWeather();
+  updateStats();
+  typeStory(`You move ${direction} into the misty unknown...`);
 }
 
-// UPDATE STATS
-function updateStats() {
-  document.getElementById('health').innerText = health;
-  document.getElementById('mana').innerText = mana;
-  document.getElementById('xp').innerText = xp;
-  document.getElementById('nextLevelXp').innerText = nextLevelXp;
-  document.getElementById('level').innerText = level;
-  document.getElementById('inventory').innerText = inventory.join(', ') || 'Empty';
-  document.getElementById('skills').innerText = skills.join(', ') || 'None';
-  document.getElementById('x').innerText = x;
-  document.getElementById('y').innerText = y;
-  renderMap();
-}
-
-// TYPE STORY (with typing fix)
+// TYPE STORY
 function typeStory(text) {
   clearInterval(typingInterval);
 
@@ -151,50 +171,17 @@ function typeStory(text) {
   }, 30);
 }
 
-// RENDER MAP
-function renderMap() {
-  const mapDiv = document.getElementById('map');
-  mapDiv.innerHTML = '';
-  for (let i = y - 2; i <= y + 2; i++) {
-    for (let j = x - 2; j <= x + 2; j++) {
-      const div = document.createElement('div');
-      div.className = 'tile';
-      if (i >= 0 && i < mapSize && j >= 0 && j < mapSize) {
-        if (map[i][j]) div.classList.add('revealed');
-      }
-      mapDiv.appendChild(div);
-    }
-  }
-}
-
-// MOVE
-function move(direction) {
-  if (direction === 'north' && y > 0) y--;
-  else if (direction === 'south' && y < mapSize - 1) y++;
-  else if (direction === 'east' && x < mapSize - 1) x++;
-  else if (direction === 'west' && x > 0) x--;
-  else {
-    typeStory("You cannot go that way.");
-    return;
-  }
-
-  map[y][x] = true;
-  randomWeather();
-  typeStory(`You move ${direction} into the shifting mist...`);
-  changeBackground('images/dark_forest_background.jpg');
-  updateStats();
-}
-
-// RANDOM WEATHER
-function randomWeather() {
-  const chance = Math.random();
-  if (chance < 0.05) sounds.thunder.play();
-  else if (chance < 0.10) sounds.rain.play();
-}
-
-// CHANGE BACKGROUND
-function changeBackground(imageFile) {
-  document.body.style.backgroundImage = `url('${imageFile}')`;
+// UPDATE STATS
+function updateStats() {
+  document.getElementById('health').innerText = health;
+  document.getElementById('mana').innerText = mana;
+  document.getElementById('xp').innerText = xp;
+  document.getElementById('nextLevelXp').innerText = nextLevelXp;
+  document.getElementById('level').innerText = level;
+  document.getElementById('inventory').innerText = inventory.join(', ') || 'Empty';
+  document.getElementById('skills').innerText = skills.join(', ') || 'None';
+  document.getElementById('x').innerText = x;
+  document.getElementById('y').innerText = y;
 }
 
 // EXPLORE
@@ -216,23 +203,8 @@ function explore() {
       typeStory("You discover an ancient relic!");
     }
   }
-  changeBackground('images/dark_forest_background.jpg');
+  drawMap();
   updateStats();
-}
-
-// RARE EVENT
-function rareEvent() {
-  const event = Math.random();
-  if (event < 0.5) {
-    typeStory("A portal appears! You are teleported randomly.");
-    x = Math.floor(Math.random() * mapSize);
-    y = Math.floor(Math.random() * mapSize);
-    changeBackground('images/magic_portal.jpg');
-  } else {
-    typeStory("You find an Ancient Shrine. +100 XP!");
-    gainXp(100);
-    changeBackground('images/magic_portal.jpg');
-  }
 }
 
 // REST
@@ -241,7 +213,7 @@ function rest() {
   mana = Math.min(mana + 30, maxMana);
   sounds.rest.play();
   typeStory("You rest under a calm clearing, regaining strength.");
-  changeBackground('images/calm_clearing.jpg');
+  drawMap();
   updateStats();
 }
 
@@ -251,11 +223,9 @@ function fight() {
   if (bosses.some(b => b.x === x && b.y === y)) {
     enemy = { name: "Ancient Wyrm", hp: 250, attack: 60, xp: 300 };
     sounds.boss.play();
-    changeBackground('images/boss_lair.jpg');
   } else {
     enemy = enemies[Math.floor(Math.random() * enemies.length)];
     sounds.attack.play();
-    changeBackground('images/battlefield.jpg');
   }
 
   const playerAttack = Math.floor(Math.random() * 50) + (skills.length * 5);
@@ -274,6 +244,7 @@ function fight() {
     }
   }
 
+  drawMap();
   updateStats();
   checkVictory();
 }
@@ -326,12 +297,13 @@ function checkVictory() {
     bossesDefeated = 0;
     x = 25;
     y = 25;
-    initMap();
+    initWorld();
+    drawMap();
     updateStats();
   }
 }
 
-// TRIGGER DEATH SCREEN
+// DEATH
 function triggerDeath() {
   document.getElementById('game-container').style.display = 'none';
 
@@ -361,7 +333,7 @@ function restartGame() {
   location.reload();
 }
 
-// PAGE LOAD - HIDE LOADING SCREEN
+// ON LOAD
 window.addEventListener('load', () => {
   const loadingScreen = document.getElementById('loading-screen');
   const gameContainer = document.getElementById('game-container');
